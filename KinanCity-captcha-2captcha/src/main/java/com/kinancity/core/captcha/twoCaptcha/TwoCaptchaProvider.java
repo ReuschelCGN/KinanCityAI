@@ -172,56 +172,54 @@ public class TwoCaptchaProvider extends CaptchaProvider {
 				}
 
 				for (List<TwoCaptchaChallenge> batch : batchList) {
-					for (TwoCaptchaChallenge challengeHack: batch) {
-						String captchaId = challengeHack.getCaptchaId();
-						logger.info("captchaIds {}", captchaId);
+					String captchaId = challengeHack.getCaptchaId();
+					logger.info("captchaIds {}", captchaId);
 
-						Request resolveRequest = buildReceiveCaptchaRequest(captchaId);
+					Request resolveRequest = buildReceiveCaptchaRequest(captchaId);
 
-						try (Response solveResponse = captchaClient.newCall(resolveRequest).execute()) {
-							String body = solveResponse.body().string();
+					try (Response solveResponse = captchaClient.newCall(resolveRequest).execute()) {
+						String body = solveResponse.body().string();
 
-							try {
-								JsonObject jsonResponse = Json.createReader(new StringReader(body)).readObject();
-								String response = jsonResponse.getString(JSON_RESPONSE);
+						try {
+							JsonObject jsonResponse = Json.createReader(new StringReader(body)).readObject();
+							String response = jsonResponse.getString(JSON_RESPONSE);
 
-								if (isValidResponse(jsonResponse)) {
-									logger.info("response : {}", body);
+							if (isValidResponse(jsonResponse)) {
+								logger.info("response : {}", body);
 
-									String[] responses = jsonResponse.getString(JSON_RESPONSE).split("\\|");
+								String[] responses = jsonResponse.getString(JSON_RESPONSE).split("\\|");
 
-									if (responses.length != batch.size()) {
-										logger.error("Number of responses [{}] do not match number of requests [{}] : {}", responses.length, batch.size(), jsonResponse.getString(JSON_RESPONSE));
-										logger.info("Switch to MissmatchRecovery mode");
-										missmatchRecovery = true;
-										recoveryModeTimer = new StopWatch();
-										recoveryModeTimer.start();
-									} else {
-										if (missmatchRecovery && recoveryModeTimer.getSplitTime() < minTimeForRecovery * 1000) {
-											logger.info("Disable MissmatchRecovery mode");
-											missmatchRecovery = false;
-											recoveryModeTimer.stop();
-										}
-										int i = 0;
-										for (TwoCaptchaChallenge challenge : batch) {
-											String response = responses[i];
-											manageChallengeResponse(challenge, response);
-											i++;
-										}
-									}
-
-									logger.debug("Remaining Challenges : {}", challenges.stream().map(c -> c.getCaptchaId()).collect(Collectors.joining(",")));
-
+								if (responses.length != batch.size()) {
+									logger.error("Number of responses [{}] do not match number of requests [{}] : {}", responses.length, batch.size(), jsonResponse.getString(JSON_RESPONSE));
+									logger.info("Switch to MissmatchRecovery mode");
+									missmatchRecovery = true;
+									recoveryModeTimer = new StopWatch();
+									recoveryModeTimer.start();
 								} else {
-									logger.error("Invalid response : {}", body);
+									if (missmatchRecovery && recoveryModeTimer.getSplitTime() < minTimeForRecovery * 1000) {
+										logger.info("Disable MissmatchRecovery mode");
+										missmatchRecovery = false;
+										recoveryModeTimer.stop();
+									}
+									int i = 0;
+									for (TwoCaptchaChallenge challenge : batch) {
+										String response = responses[i];
+										manageChallengeResponse(challenge, response);
+										i++;
+									}
 								}
-							} catch (JsonParsingException e) {
-								logger.error("2captcha response was not a valid JSON : {}", body);
-							}
 
-						} catch (Exception e) {
-							logger.error("Error while calling RES 2captcha : {}", e.getMessage());
+								logger.debug("Remaining Challenges : {}", challenges.stream().map(c -> c.getCaptchaId()).collect(Collectors.joining(",")));
+
+							} else {
+								logger.error("Invalid response : {}", body);
+							}
+						} catch (JsonParsingException e) {
+							logger.error("2captcha response was not a valid JSON : {}", body);
 						}
+
+					} catch (Exception e) {
+						logger.error("Error while calling RES 2captcha : {}", e.getMessage());
 					}
 				}
 			}
