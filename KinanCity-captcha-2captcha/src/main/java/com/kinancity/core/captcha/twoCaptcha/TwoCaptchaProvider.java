@@ -183,12 +183,14 @@ public class TwoCaptchaProvider extends CaptchaProvider {
 
 							try {
 								JsonObject jsonResponse = Json.createReader(new StringReader(body)).readObject();
+								String response = jsonResponse.getString(JSON_RESPONSE);
+
 								if (isValidResponse(jsonResponse)) {
 									logger.info("response : {}", body);
 
 									String[] responses = jsonResponse.getString(JSON_RESPONSE).split("\\|");
 
-									if (responses.length != 1) {
+									if (responses.length != batch.size()) {
 										logger.error("Number of responses [{}] do not match number of requests [{}] : {}", responses.length, batch.size(), jsonResponse.getString(JSON_RESPONSE));
 										logger.info("Switch to MissmatchRecovery mode");
 										missmatchRecovery = true;
@@ -198,9 +200,14 @@ public class TwoCaptchaProvider extends CaptchaProvider {
 										if (missmatchRecovery && recoveryModeTimer.getSplitTime() < minTimeForRecovery * 1000) {
 											logger.info("Disable MissmatchRecovery mode");
 											missmatchRecovery = false;
+											recoveryModeTimer.stop();
 										}
-										String response = responses[0];
-										manageChallengeResponse(challengeHack, response);
+										int i = 0;
+										for (TwoCaptchaChallenge challenge : batch) {
+											String response = responses[i];
+											manageChallengeResponse(challenge, response);
+											i++;
+										}
 									}
 
 									logger.debug("Remaining Challenges : {}", challenges.stream().map(c -> c.getCaptchaId()).collect(Collectors.joining(",")));
@@ -217,7 +224,6 @@ public class TwoCaptchaProvider extends CaptchaProvider {
 						}
 					}
 				}
-
 			}
 
 			// Update queue size
@@ -242,7 +248,7 @@ public class TwoCaptchaProvider extends CaptchaProvider {
 						try {
 							JsonObject jsonResponse = Json.createReader(new StringReader(body)).readObject();
 
-							if (jsonResponse.getInt(JSON_STATUS) == 1) {
+							if (isValidResponse(jsonResponse)) {
 								int captchaIdInt = jsonResponse.getInt(JSON_RESPONSE);
 								String captchaId = String.valueOf(captchaIdInt);
 								logger.info("Requested new Captcha, id : {}", captchaId);
