@@ -1,4 +1,4 @@
-# KinanCity - CaptchaAI Fork
+# KinanCity - CaptchaAI Fork 
 
 There's CapSolver (previously known as captchaai.org) and captchaai.com. Kinan supports CapSolver, but not CaptchaAi, 
 which is the cheapest Captcha solver I'm aware of.
