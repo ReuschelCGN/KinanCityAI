@@ -172,7 +172,7 @@ public class TwoCaptchaProvider extends CaptchaProvider {
 				}
 
 				for (List<TwoCaptchaChallenge> batch : batchList) {
-					String captchaId = challengeHack.getCaptchaId();
+					String captchaId = challenge.getCaptchaId();
 					logger.info("captchaIds {}", captchaId);
 
 					Request resolveRequest = buildReceiveCaptchaRequest(captchaId);
