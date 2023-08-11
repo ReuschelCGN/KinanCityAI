@@ -242,7 +242,7 @@ public class TwoCaptchaProvider extends CaptchaProvider {
 						try {
 							JsonObject jsonResponse = Json.createReader(new StringReader(body)).readObject();
 
-							if (isValidResponse(jsonResponse)) {
+							if (jsonResponse.getInt(JSON_STATUS) == 1) {
 								int captchaIdInt = jsonResponse.getInt(JSON_RESPONSE);
 								String captchaId = String.valueOf(captchaIdInt);
 								logger.info("Requested new Captcha, id : {}", captchaId);
