@@ -96,7 +96,7 @@ public class Configuration {
 
 	private int captchaMaxTotalTime = 600;
 
-	private int captchaMaxParallelChallenges = 20;
+	private int captchaMaxParallelChallenges = 5;
 
 	// If true, everything will be mocked
 	private boolean dryRun = false;
