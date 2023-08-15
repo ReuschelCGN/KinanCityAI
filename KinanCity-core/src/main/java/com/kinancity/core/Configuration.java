@@ -27,6 +27,7 @@ import com.kinancity.core.captcha.antiCaptcha.AntiCaptchaProvider;
 import com.kinancity.core.captcha.imageTypers.ImageTypersProvider;
 import com.kinancity.core.captcha.impl.LogCaptchaCollector;
 import com.kinancity.core.captcha.twoCaptcha.TwoCaptchaProvider;
+import com.kinancity.core.captcha.captchaai.CaptchaAiProvider;
 import com.kinancity.core.errors.ConfigurationException;
 import com.kinancity.core.generator.AccountGenerator;
 import com.kinancity.core.proxy.ProxyInfo;
@@ -53,6 +54,8 @@ public class Configuration {
 	public static final String PROVIDER_ANTICAPTCHA = "antiCaptcha";
 
 	public static final String PROVIDER_CAPSOLVER = "capsolver";
+
+	public static final String PROVIDER_CAPTCHAAI = "captchaai";
 
 	public static final String PROVIDER_DBC = "deathbycaptcha";
 
@@ -176,6 +179,11 @@ public class Configuration {
 							// Add imageTypers Provider
 							provider = CapsolverCaptchaProvider.getInstance(captchaQueue, captchaKey);
 							providerThreadName = PROVIDER_CAPSOLVER;
+						} else if (PROVIDER_CAPTCHAAI.equals(captchaProvider)) {
+							// Add CaptchaAi Provider
+							CaptchaAiProvider captchaAiProvider = CaptchaAiProvider.class.cast(CaptchaAiProvider.getInstance(captchaQueue, captchaKey));
+							provider = captchaAiProvider;
+							providerThreadName = PROVIDER_CAPTCHAAI;
 						} else if (PROVIDER_DBC.equals(captchaProvider)) {
 							// Add imageTypers Provider
 							provider = DeathByCaptchaProvider.getInstance(captchaQueue, captchaKey);
