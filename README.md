@@ -15,10 +15,10 @@ Please do not create big PRs on this. If you have the time, please make a proper
 
 # Setup
 
-captchaai functionality is injected into the 2captcha module. So your config just has to look like this:
+captchaai functionality is in new module, your config just has to look like this:
 
 ```properties
-captcha.provider=2captcha
+captcha.provider=captchaai
 captcha.key=dfe2cfca16364a4986b88cb345b1ecbb
 captchaMaxParallelChallenges=5
 ```
