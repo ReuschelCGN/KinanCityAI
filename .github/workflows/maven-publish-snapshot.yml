@@ -5,7 +5,7 @@ name: Maven Package Develop Snapshot
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ develop-fe ]
 
 jobs:
   build:
