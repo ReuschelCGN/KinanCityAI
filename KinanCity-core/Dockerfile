@@ -1,4 +1,4 @@
-FROM openjdk:8
+FROM openjdk:11
 MAINTAINER drallieiv
 
 RUN mkdir -p /kinan/bin && mkdir -p /kinan/data
